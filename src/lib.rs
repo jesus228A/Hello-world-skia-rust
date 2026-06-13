@@ -10,18 +10,16 @@ fn android_main(app: AndroidApp) {
     loop {
         app.poll_events(Some(Duration::from_millis(16)), |event| {
             match event {
-                // Parche 1: Se usan llaves y .. para ignorar los datos internos del InitWindow
                 PollEvent::Main(MainEvent::InitWindow { .. }) => {
                     nativeWindow = Some(app.native_window().unwrap().ptr().as_ptr());
                     if let Some(windowPtr) = nativeWindow {
                         unsafe { pintarConSkia(windowPtr); }
                     }
                 }
-                // Parche 2: En la v0.5 se llama WindowDestroyed
-                PollEvent::Main(MainEvent::WindowDestroyed { .. }) => {
+                // Parche de fuego: En la v0.5 el evento se llama Terminated
+                PollEvent::Main(MainEvent::Terminated) => {
                     nativeWindow = None;
                 }
-                // Parche 3: En la v0.5 se llama Destroy
                 PollEvent::Main(MainEvent::Destroy) => return,
                 _ => {}
             }
@@ -29,8 +27,7 @@ fn android_main(app: AndroidApp) {
     }
 }
 
-// Parche 4: Le ponemos guion bajo a _window para silenciar el warning si aún no pintas nada
 unsafe fn pintarConSkia(_window: *mut ANativeWindow) {
-    // Aquí va a ir tu magia pesada con Skia más adelante, carnal
+    // Los fierros de Skia entrarán aquí en el siguiente round, carnal
 }
 
