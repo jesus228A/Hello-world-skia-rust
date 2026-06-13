@@ -10,24 +10,27 @@ fn android_main(app: AndroidApp) {
     loop {
         app.poll_events(Some(Duration::from_millis(16)), |event| {
             match event {
-                PollEvent::Main(MainEvent::InitWindow) => {
+                // Parche 1: Se usan llaves y .. para ignorar los datos internos del InitWindow
+                PollEvent::Main(MainEvent::InitWindow { .. }) => {
                     nativeWindow = Some(app.native_window().unwrap().ptr().as_ptr());
                     if let Some(windowPtr) = nativeWindow {
                         unsafe { pintarConSkia(windowPtr); }
                     }
                 }
-                PollEvent::Main(MainEvent::DestroyWindow) => {
+                // Parche 2: En la v0.5 se llama WindowDestroyed
+                PollEvent::Main(MainEvent::WindowDestroyed { .. }) => {
                     nativeWindow = None;
                 }
-                PollEvent::Main(MainEvent::Terminate) => return,
+                // Parche 3: En la v0.5 se llama Destroy
+                PollEvent::Main(MainEvent::Destroy) => return,
                 _ => {}
             }
         });
     }
 }
 
-unsafe fn pintarConSkia(window: *mut ANativeWindow) {
-    // Aquí va tu lógica fina de renderizado con Skia
-    // Por ahora un cascarón limpio para que compile al tiro
+// Parche 4: Le ponemos guion bajo a _window para silenciar el warning si aún no pintas nada
+unsafe fn pintarConSkia(_window: *mut ANativeWindow) {
+    // Aquí va a ir tu magia pesada con Skia más adelante, carnal
 }
 
