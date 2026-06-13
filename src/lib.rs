@@ -1,9 +1,9 @@
 // INDISPENSABLE: Importa el motor de eventos de Google para interactuar con el OS.
 use android_activity::{AndroidApp, MainEvent, PollEvent};
-// INDISPENSABLE: Importa el puntero structured de la pantalla física de Android.
+// INDISPENSABLE: Importa el puntero estructurado de la pantalla física de Android.
 use ndk_sys::ANativeWindow;
 // INDISPENSABLE: Importa las herramientas mínimas de Skia para inyectar color y texto.
-use skia_safe::{Color, Font, Paint, Surface};
+use skia_safe::{Color, Font, Paint, Surface, Typeface};
 // INDISPENSABLE: Define el tipo de tiempo para que el procesador no trabaje al 100% en vacío.
 use std::time::Duration;
 
@@ -44,20 +44,22 @@ unsafe fn pintarConSkia(window: *mut ANativeWindow) {
     let info = skia_safe::ImageInfo::new((ancho, alto), skia_safe::ColorType::RGBA8888, skia_safe::AlphaType::Premul, None);
     // INDISPENSABLE: Mide cuántos bytes reales ocupa una fila de píxeles en la pantalla (stride * 4).
     let salto = buf.stride as usize * 4;
-    // INDISPENSABLE: Convierte el puntero crudo de Android en un slice de Rust modificable en tiempo real.
-    let pixeles = std::slice::from_raw_parts_mut(buf.bits as *mut u8, (salto * alto as usize));
-    // SE REDUJO AQUÍ: Skia dibuja directo en la RAM de Android; nos ahorramos 20 líneas de copiado manual.
+    // SE CORRIGIÓ AQUÍ: Eliminamos los paréntesis pendejos para limpiar los warnings del compilador.
+    let pixeles = std::slice::from_raw_parts_mut(buf.bits as *mut u8, salto * alto as usize);
+    // INDISPENSABLE: Skia mapea directo la memoria física que nos prestó Android (buf.bits).
     let mut superficie = Surface::new_raster_direct(&info, pixeles, Some(salto), None).unwrap();
 
     // INDISPENSABLE: Extrae el lienzo activo que nos da acceso a los comandos gráficos de Skia.
     let lienzo = superficie.canvas();
-    // SE QUEDA: Pinta toda la pantalla de negro para borrar lo que hubiera antes.
+    // SE QUEDA: Pinta toda la pantalla de negro para borrar residuos de memoria.
     lienzo.clear(Color::BLACK);
 
-    // SE REDUJO AQUÍ: Poniendo 'None' forzamos a Skia a usar su fuente interna sin cargar archivos.
-    let fuente = Font::new(None, 60.0).unwrap();
-    // SE REDUJO AQUÍ: Inyectamos el color rojo directo con un método en lugar de crear configuraciones extras.
-    let pintura = Paint::default().with_color(Color::RED);
+    // SE CORRIGIÓ AQUÍ: Forzamos el Typeface por defecto y quitamos el unwrap erróneo.
+    let fuente = Font::from_typeface(Typeface::default(), 60.0);
+    // SE CORRIGIÓ AQUÍ: Instanciamos una pintura mutable para poder inyectarle el color de forma legal.
+    let mut pintura = Paint::default();
+    // SE CORRIGIÓ AQUÍ: Modificamos el estado de la pintura usando la función correcta de la API.
+    pintura.set_color(Color::RED);
 
     // INDISPENSABLE: Rasteriza la cadena "Hola Mundo" en las coordenadas (40, 120) usando la fuente y pintura.
     lienzo.draw_str("Hola Mundo", (40.0, 120.0), &fuente, &pintura);
