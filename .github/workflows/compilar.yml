@@ -11,10 +11,9 @@ jobs:
       - name: Configurar Rust en el servidor
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Configurar las herramientas de Android (SDK y NDK)
-        uses: android-actions/setup-android@v3
-        with:
-          api-level: 30 # <--- ESTE ES EL PARCHE DE FUERZA PARA CORREGIR EL ERROR
+      - name: Forzar instalacion de Android Platform 30
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-30"
 
       - name: Instalar el empaquetador cargo-apk en la nube
         run: cargo install cargo-apk
