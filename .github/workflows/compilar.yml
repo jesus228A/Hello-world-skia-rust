@@ -21,7 +21,7 @@ jobs:
         run: cargo install cargo-apk
 
       - name: ¡Compilar el APK al fierro!
-        run: cargo apk build --release
+        run: cargo apk build 
 
       - name: Guardar el APK terminado para descargarlo
         uses: actions/upload-artifact@v4
