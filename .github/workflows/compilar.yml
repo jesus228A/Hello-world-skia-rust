@@ -23,9 +23,11 @@ jobs:
       - name: ¡Compilar el APK al fierro!
         run: cargo apk build 
 
-      - name: Guardar el APK terminado para descargarlo
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: MiAppNativaSkia
-          path: target/release/apk/*.apk
+          # SE CORRIGIÓ AQUÍ: Cambiamos 'release' por 'debug' para que encuentre el APK sin llaves
+          path: target/debug/apk/*.apk
+          if-no-files-found: warn
 
