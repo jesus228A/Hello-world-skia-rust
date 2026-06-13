@@ -8,8 +8,10 @@ jobs:
       - name: Descargar el código del repo
         uses: actions/checkout@v4
 
-      - name: Configurar Rust en el servidor
+      - name: Configurar Rust y el Target para Celular
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android # <--- ESTO LE DA EL MOLDE DE PROCESADOR DE CELULAR
 
       - name: Forzar instalacion de Android Platform 30
         run: |
