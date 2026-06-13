@@ -1,0 +1,28 @@
+name: Compilador en la Nube
+on: [push] # Se activa en automático cada que subes código
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código del repo
+        uses: actions/checkout@v4
+
+      - name: Configurar Rust en el servidor
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Configurar las herramientas de Android (SDK y NDK)
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar el empaquetador cargo-apk en la nube
+        run: cargo install cargo-apk
+
+      - name: ¡Compilar el APK al fierro!
+        run: cargo apk build --release
+
+      - name: Guardar el APK terminado para descargarlo
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiAppNativaSkia
+          path: target/release/apk/*.apk
+
