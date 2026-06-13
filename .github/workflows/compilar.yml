@@ -1,5 +1,5 @@
 name: Compilador en la Nube
-on: [push] # Se activa en automático cada que subes código
+on: [push]
 
 jobs:
   build:
@@ -13,6 +13,8 @@ jobs:
 
       - name: Configurar las herramientas de Android (SDK y NDK)
         uses: android-actions/setup-android@v3
+        with:
+          api-level: 30 # <--- ESTE ES EL PARCHE DE FUERZA PARA CORREGIR EL ERROR
 
       - name: Instalar el empaquetador cargo-apk en la nube
         run: cargo install cargo-apk
