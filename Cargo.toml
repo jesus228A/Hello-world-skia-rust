@@ -1,0 +1,20 @@
+[package]
+name = "holaMundoSkia"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# El pegamento con el ciclo de vida de la pantalla de Android
+android_activity = { version = "0.5", features = ["native-activity"] }
+# Nuestro maquinista gráfico de confianza
+skia-safe = "0.64" 
+ndk-sys = "0.5"
+
+[package.metadata.android]
+# Esto le genera el manifiesto mínimo a Android de forma automática
+package = "com.jesus.holaskia"
+label = "Hola Mundo Skia"
+
